@@ -8,95 +8,12 @@ from wikiextractor.Multiprocess_support import extract_process, reduce_process
 from wikiextractor.NextFile import NextFile
 from wikiextractor.OutputSplitter import OutputSplitter
 from wikiextractor.collect_pages import collect_pages
+from wikiextractor.load_templates import load_templates
 from wikiextractor.utilities import decode_open
 from .parse_arguments import parse_arguments 
 from multiprocessing import Queue, get_context
 from timeit import default_timer
 from .extract.extract import Extractor, ignoreTag, define_template
-# ----------------------------------------------------------------------
-# Modules
-
-# Only minimal support
-# FIXME: import Lua modules.
-
-modules = {
-	'convert': {
-		'convert': lambda x, u, *rest: x + ' ' + u,  # no conversion
-	}
-}
-
-# ----------------------------------------------------------------------
-
-def load_templates(file, output_file=None):
-	"""
-	Load templates from :param file:.
-	:param output_file: file where to save templates and modules.
-	:return: number of templates loaded.
-	"""
-	articles = 0
-	templates = 0
-	page = []
-	inText = False
-	if output_file:
-		output = open(output_file, 'w')
-	for line in file:
-		#line = line.decode('utf-8')
-		if '<' not in line:  # faster than doing re.search()
-			if inText:
-				page.append(line)
-			continue
-		m = constents.tagRE.search(line)
-		if not m:
-			continue
-		tag = m.group(2)
-		if tag == 'page':
-			page = []
-		elif tag == 'title':
-			title = m.group(3)
-			if not output_file and not constents.templateNamespace:  # do not know it yet
-				# we reconstruct it from the first title
-				colon = title.find(':')
-				if colon > 1:
-					constents.templateNamespace = title[:colon]
-					Extractor.templatePrefix = title[:colon + 1]
-			# FIXME: should reconstruct also moduleNamespace
-		elif tag == 'text':
-			inText = True
-			line = line[m.start(3):m.end(3)]
-			page.append(line)
-			if m.lastindex == 4:  # open-close
-				inText = False
-		elif tag == '/text':
-			if m.group(1):
-				page.append(m.group(1))
-			inText = False
-		elif inText:
-			page.append(line)
-		elif tag == '/page':
-			if title.startswith(Extractor.templatePrefix):
-				define_template(title, page)
-				templates += 1
-			# save templates and modules to file
-			if output_file and (title.startswith(Extractor.templatePrefix) or
-								title.startswith(constents.modulePrefix)):
-				output.write('<page>\n')
-				output.write('   <title>%s</title>\n' % title)
-				output.write('   <ns>10</ns>\n')
-				output.write('   <text>')
-				for line in page:
-					output.write(line)
-				output.write('   </text>\n')
-				output.write('</page>\n')
-			page = []
-			articles += 1
-			if articles % 100000 == 0:
-				logging.info("Preprocessed %d pages", articles)
-	if output_file:
-		output.close()
-		logging.info("Saved %d templates to '%s'", templates, output_file)
-	return templates
-
-
 
 def process_dump(input_file, template_file, out_file, file_size, file_compress,
 				 process_count, html_safe, expand_templates=True):

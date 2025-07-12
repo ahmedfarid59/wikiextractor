@@ -11,6 +11,55 @@ urlbase = ''                # This is obtained from <siteinfo>
 # wikt: shortcut for Wiktionary
 #
 acceptedNamespaces = ['w', 'wiktionary', 'wikt']
+# ----------------------------------------------------------------------
+# Modules
+
+# Only minimal support
+# FIXME: import Lua modules.
+
+modules = {
+	'convert': {
+		'convert': lambda x, u, *rest: x + ' ' + u,  # no conversion
+	}
+}
+
+# ----------------------------------------------------------------------
+
+
+
+# match tail after wikilink
+tailRE = re.compile('\w+')
+syntaxhighlight = re.compile('&lt;syntaxhighlight .*?&gt;(.*?)&lt;/syntaxhighlight&gt;', re.DOTALL)
+
+## PARAMS ####################################################################
+
+##
+# Drop these elements from article text
+#
+discardElements = [
+	'gallery', 'timeline', 'noinclude', 'pre',
+	'table', 'tr', 'td', 'th', 'caption', 'div',
+	'form', 'input', 'select', 'option', 'textarea',
+	'ul', 'li', 'ol', 'dl', 'dt', 'dd', 'menu', 'dir',
+	'ref', 'references', 'img', 'imagemap', 'source', 'small'
+]
+
+# ======================================================================
+# Extract Template definition
+
+reNoinclude = re.compile(r'<noinclude>(?:.*?)</noinclude>', re.DOTALL)
+reIncludeonly = re.compile(r'<includeonly>|</includeonly>', re.DOTALL)
+
+# These are built before spawning processes, hence they are shared.
+templates = {}
+redirects = {}
+# cache of parser templates
+# FIXME: sharing this with a Manager slows down.
+templateCache = {}
+
+
+
+
 
 
 
@@ -37,3 +86,7 @@ knownNamespaces = set(['Template'])
 moduleNamespace = ''
 
 modulePrefix = moduleNamespace + ':'
+# Match HTML comments
+# The buggy template {{Template:T}} has a comment terminating with just "->"
+comment = re.compile(r'<!--.*?-->', re.DOTALL)
+
