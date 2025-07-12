@@ -9,21 +9,12 @@
 # - Keep tables. They're mostly garbage but can be removed later (remove "^!*").
 # - Remove disambiguation pages. Right now there is no use for them.
 
-INPUT=$1
-PROCESSES=$2
-TEMPLATES=$3
-OUTPUT=$4
-
-python -m wikiextractor.WikiExtractor.py $INPUT \
+python3 -m wikiextractor.WikiExtractor \
+ arwiki-latest-pages-articles.xml.bz2 \
        --json \
-       --processes $PROCESSES \
-       --templates $TEMPLATES \
-       --output $OUTPUT \
-       --bytes 1M \
+       --processes 9 \
+       --templates  templates \
+       --output arwiki-latest-pages-articles \
+       --bytes 10M \
        --compress \
-       --links \
-       --sections \
-       --lists \
-       --keep_tables \
-       --min_text_length 0 \
-       --filter_disambig_pages
+       --links 

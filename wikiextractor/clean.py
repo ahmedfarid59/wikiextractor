@@ -16,7 +16,7 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # =============================================================================
 
-from wikiextractor.extract import Extractor, ignoreTag, resetIgnoredTags
+from wikiextractor.extract.extract import Extractor, ignoreTag, resetIgnoredTags
 
 
 def clean_markup(markup, keep_links=False, ignore_headers=True):
