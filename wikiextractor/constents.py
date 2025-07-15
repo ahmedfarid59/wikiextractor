@@ -90,3 +90,5 @@ modulePrefix = moduleNamespace + ':'
 # The buggy template {{Template:T}} has a comment terminating with just "->"
 comment = re.compile(r'<!--.*?-->', re.DOTALL)
 
+# Minimum size of output files
+minFileSize = 200 * 1024

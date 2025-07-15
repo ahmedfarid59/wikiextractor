@@ -1,6 +1,6 @@
 import time, html, json, logging, re
+from urllib.parse import quote, urlencode
 from sys import modules
-from urllib.parse import urlencode
 from wikiextractor import constents
 from .Template import Template
 from .Infix import Infix
@@ -245,7 +245,7 @@ def replaceExternalLinks(text):
 def makeExternalLink(url, anchor):
 	"""Function applied to wikiLinks"""
 	if Extractor.keepLinks:
-		return '<a href="%s">%s</a>' % (urlencode(url), anchor)
+		return r'<a href="%s">%s</a>' % (quote(url), anchor)
 	else:
 		return anchor
 def makeExternalImage(url, alt=''):
@@ -305,7 +305,7 @@ def makeInternalLink(title, label):
 		if colon2 > 1 and title[colon + 1:colon2] not in constents.acceptedNamespaces:
 			return ''
 	if Extractor.keepLinks:
-		return '<a href="%s">%s</a>' % (urlencode(title), label)
+		return '<a href="%s">%s</a>' % (quote(title), label)
 	else:
 		return label
 # ----------------------------------------------------------------------
@@ -401,7 +401,7 @@ class Extractor():
 	HtmlFormatting = False
 	##
 	# Whether to produce json instead of the default <doc> output format.
-	toJson = False
+	to_json = False
 	##
 	# Obtained from TemplateNamespace
 	templatePrefix = ''

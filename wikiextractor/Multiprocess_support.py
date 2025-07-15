@@ -4,6 +4,8 @@ from io import StringIO
 import logging
 from timeit import default_timer
 
+from wikiextractor.NextFile import NextFile
+from wikiextractor.OutputSplitter import OutputSplitter
 from wikiextractor.extract.extract import Extractor
 
 
@@ -24,13 +26,14 @@ def extract_process(jobs_queue, output_queue, html_safe):
 		else:
 			break
 
-def reduce_process(output_queue, output):
+def reduce_process(output_queue, out_file, file_size, file_compress):
 	"""
 	Pull finished article text, write series of files (or stdout)
 	:param output_queue: text to be output.
 	:param output: file object where to print.
 	"""
-
+	nextFile = NextFile(out_file)
+	output = OutputSplitter(nextFile, file_size, file_compress)
 	interval_start = default_timer()
 	period = 100000
 	# FIXME: use a heap
