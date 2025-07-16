@@ -17,14 +17,13 @@ def extract_process(jobs_queue, output_queue, html_safe):
 	"""
 	while True:
 		job = jobs_queue.get()  # job is (id, revid, urlbase, title, page)
-		if job:
-			out = StringIO()  # memory buffer
-			Extractor(*job[:-1]).extract(out, html_safe)  # (id, urlbase, title, page)
-			text = out.getvalue()
-			output_queue.put((job[-1], text))  # (ordinal, extracted_text)
-			out.close()
-		else:
+		if not  job:
 			break
+		out = StringIO()  # memory buffer
+		Extractor(*job[:-1]).extract(out, html_safe)  # (id, urlbase, title, page)
+		text = out.getvalue()
+		output_queue.put((job[-1], text))  # (ordinal, extracted_text)
+		out.close()
 
 def reduce_process(output_queue, out_file, file_size, file_compress):
 	"""

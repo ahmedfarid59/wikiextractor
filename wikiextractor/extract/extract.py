@@ -399,17 +399,12 @@ class Extractor():
 	##
 	# Whether to output text with HTML formatting elements in <doc> files.
 	HtmlFormatting = False
-	##
 	# Whether to produce json instead of the default <doc> output format.
 	to_json = False
-	##
 	# Obtained from TemplateNamespace
 	templatePrefix = ''
-# ===========================================================================
 	def __init__(self, id, revid, urlbase, title, page):
-		"""
-		:param page: a list of lines.
-		"""
+		"""param page: a list of lines."""
 		self.id = id
 		self.revid = revid
 		self.url = get_url(urlbase, id)
@@ -421,8 +416,7 @@ class Extractor():
 		self.recursion_exceeded_2_errs = 0  # template recursion within expandTemplate()
 		self.recursion_exceeded_3_errs = 0  # parameter recursion
 		self.template_title_errs = 0
-	def clean_text(self, text, mark_headers=False, expand_templates=True,
-				   html_safe=True):
+	def clean_text(self, text, mark_headers=False, expand_templates=True, html_safe=True):
 		"""
 		:param mark_headers: True to distinguish headers from paragraphs
 		  e.g. "## Section 1"
