@@ -1,10 +1,8 @@
 import re
 from wikiextractor import constents
 from wikiextractor.extract.extract import Extractor
-from wikiextractor.utilities import decode_open
 
-def extract_info(input_file):
-	input = decode_open(input_file)
+def extract_info(input ):
 	# collect siteinfo
 	for line in input:
 		m = constents.tagRE.search(line)
@@ -26,5 +24,3 @@ def extract_info(input_file):
 				constents.modulePrefix = constents.moduleNamespace + ':'
 		elif tag == '/siteinfo':
 			break
-	input.close()
-	output.close()

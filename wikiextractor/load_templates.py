@@ -14,7 +14,7 @@ def load_templates(file, output_file=None):
 	page = []
 	inText = False
 	if output_file:
-		output = open(output_file, 'w')
+		output = open(output_file, 'w',encoding='utf-8')
 	for line in file:
 		#line = line.decode('utf-8')
 		if '<' not in line:  # faster than doing re.search()
@@ -55,7 +55,7 @@ def load_templates(file, output_file=None):
 			# save templates and modules to file
 			if output_file and (title.startswith(Extractor.templatePrefix) or
 								title.startswith(constents.modulePrefix)):
-				output.write('<page>\n'.encode('utf-8'))
+				output.write('<page>\n')
 				output.write('   <title>%s</title>\n' % title)
 				output.write('   <ns>10</ns>\n')
 				output.write('   <text>')

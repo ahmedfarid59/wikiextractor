@@ -1,15 +1,10 @@
-import logging
+import logging, os , re , sys
 from multiprocessing import get_context
-import os
-import re
-import sys
 from timeit import default_timer
 from wikiextractor import constents
 from wikiextractor.Multiprocess_support import extract_process, reduce_process
-from wikiextractor.NextFile import NextFile
-from wikiextractor.OutputSplitter import OutputSplitter
 from wikiextractor.collect_pages import collect_pages
-from wikiextractor.extract.extract import Extractor
+from wikiextractor.extract_info import extract_info
 from wikiextractor.load_templates import load_templates
 from wikiextractor.utilities import decode_open
 
@@ -25,6 +20,8 @@ def process_dump(input_file, template_file, out_file, file_size, file_compress,
 	:html_safe: whether to convert entities in text to HTML.
 	:param expand_templates: whether to expand templates.
 	"""
+	input = decode_open(input_file)
+	extract_info(input)
 	if expand_templates:
 		# preprocess
 		template_load_start = default_timer()
@@ -35,15 +32,14 @@ def process_dump(input_file, template_file, out_file, file_size, file_compress,
 			file.close()
 		else:
 			logging.info("Preprocessing '%s' to collect template definitions: this may take some time.", input_file)
-			input = decode_open(input_file)
 			templates = load_templates(input, template_file)
 			input.close()
+			input = decode_open(input_file)
 		template_load_elapsed = default_timer() - template_load_start
 		logging.info("Loaded %d templates in %.1fs", templates, template_load_elapsed)
 	# process pages
 	logging.info("Starting page extraction from %s.", input_file)
 	extract_start = default_timer()
-	input = decode_open(input_file)
 	# Parallel Map/Reduce:
 	# - pages to be processed are dispatched to workers - a reduce process collects the results, sort them and print them.
 	ctx = get_context("spawn")
