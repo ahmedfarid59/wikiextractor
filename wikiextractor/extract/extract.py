@@ -1,4 +1,5 @@
-import time, html, json, logging, re
+import time, html, json, re
+from wikiextractor.constents import logger
 from urllib.parse import quote, urlencode
 from sys import modules
 from wikiextractor import constents
@@ -386,21 +387,19 @@ spaces = re.compile(r' {2,}')
 dots = re.compile(r'\.{4,}')
 # ======================================================================
 substWords = 'subst:|safesubst:'
-class Extractor():
+class Extractor:
 	"""
 	An extraction task on a article.
 	"""
-	##
 	# Whether to preserve links in output
 	keepLinks = False
 	##
 	# Whether to preserve section titles
 	keepSections = True
-	##
 	# Whether to output text with HTML formatting elements in <doc> files.
 	HtmlFormatting = False
 	# Whether to produce json instead of the default <doc> output format.
-	to_json = False
+	to_json = True
 	# Obtained from TemplateNamespace
 	templatePrefix = ''
 	def __init__(self, id, revid, urlbase, title, page):
@@ -430,8 +429,7 @@ class Extractor():
 		self.magicWords['currentday'] = time.strftime('%d')
 		self.magicWords['currenthour'] = time.strftime('%H')
 		self.magicWords['currenttime'] = time.strftime('%H:%M:%S')
-		text = clean(self, text, expand_templates=expand_templates,
-					 html_safe=html_safe)
+		text = clean(self, text, expand_templates=expand_templates,html_safe=html_safe)
 		text = compact(text, mark_headers=mark_headers)
 		return text
 	def extract(self, out, html_safe=True):
@@ -439,7 +437,7 @@ class Extractor():
 		:param out: a memory file.
 		:param html_safe: whether to escape HTML entities.
 		"""
-		logging.debug("%s\t%s", self.id, self.title)
+		logger.debug(f"{self.id}\t{self.title}")
 		text = ''.join(self.page)
 		text = self.clean_text(text, html_safe=html_safe)
 		if self.to_json:
@@ -467,9 +465,7 @@ class Extractor():
 				self.recursion_exceeded_2_errs,
 				self.recursion_exceeded_3_errs)
 		if any(errs):
-			logging.warn("Template errors in article '%s' (%s): title(%d) recursion(%d, %d, %d)",
-						 self.title, self.id, *errs)
-	# ----------------------------------------------------------------------
+			logger.debug(f"Template errors in article  {self.title}: title({self.id}) recursion({errs})")
 	# Expand templates
 	maxTemplateRecursionLevels = 30
 	maxParameterRecursionLevels = 16
@@ -514,7 +510,7 @@ class Extractor():
 		templateParams = {}
 		if not parameters:
 			return templateParams
-		logging.debug('<templateParams: %s', '|'.join(parameters))
+		logger.debug('<templateParams: %s', '|'.join(parameters))
 		# Parameters can be either named or unnamed. In the latter case, their
 		# name is defined by their ordinal position (1, 2, 3, ...).
 		unnamedParameterCounter = 0
@@ -563,7 +559,7 @@ class Extractor():
 				if ']]' not in param:  # if the value does not contain a link, trim whitespace
 					param = param.strip()
 				templateParams[str(unnamedParameterCounter)] = param
-		logging.debug('   templateParams> %s', '|'.join(templateParams.values()))
+		logger.debug('   templateParams> %s', '|'.join(templateParams.values()))
 		return templateParams
 	def expandTemplate(self, body):
 		"""Expands template invocation.
@@ -603,10 +599,10 @@ class Extractor():
 			self.recursion_exceeded_2_errs += 1
 			# logging.debug('   INVOCATION> %d %s', len(self.frame), body)
 			return ''
-		logging.debug('INVOCATION %d %s', len(self.frame), body)
+		logger.debug('INVOCATION %d %s', len(self.frame), body)
 		parts = splitParts(body)
 		# title is the portion before the first |
-		logging.debug('TITLE %s', parts[0].strip())
+		logger.debug('TITLE %s', parts[0].strip())
 		title = self.expandTemplates(parts[0].strip())
 		# SUBST
 		# Apply the template tag to parameters without
@@ -758,7 +754,7 @@ def sharp_invoke(module, function, frame):
 			# template invocation
 			templateTitle = fullyQualifiedTemplateTitle(function)
 			if not templateTitle:
-				logging.warn("Template with empty title")
+				logger.warn("Template with empty title")
 			pair = next((x for x in frame if x[0] == templateTitle), None)
 			if pair:
 				params = pair[1]
@@ -850,5 +846,5 @@ def define_template(title, page):
 		text = constents.reIncludeonly.sub('', text)
 	if text:
 		if title in constents.templates and constents.templates[title] != text:
-			logging.warn('Redefining: %s', title)
+			logger.warn('Redefining: %s', title)
 		constents.templates[title] = text

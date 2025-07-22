@@ -1,7 +1,12 @@
 # Program version
 __version__ = '3.0.7'
+import logging
 import re
 
+FORMAT = '%(message)s: %(levelname)s'
+logging.basicConfig(format=FORMAT)
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 urlbase = ''                # This is obtained from <siteinfo>
 ##

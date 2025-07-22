@@ -144,8 +144,7 @@ optional arguments:
 
 Output:
   -o OUTPUT, --output OUTPUT
-                        directory for extracted files (or '-' for dumping to
-                        stdin)
+                        directory for extracted files 
   -b n[KMG], --bytes n[KMG]
                         maximum bytes per output file (default 1M)
   -c, --compress        compress output files using bzip
